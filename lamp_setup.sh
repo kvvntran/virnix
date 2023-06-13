@@ -12,11 +12,11 @@ apt update > /dev/null 2>&1
 apt upgrade -y > /dev/null 2>&1
 
 # Install Apache, MySQL, PHP, and other dependencies
-echo "Install Apache, MySQL, PHP, and other dependencies"
+echo "Installing Apache, MySQL, PHP, and other dependencies"
 apt install -y apache2 mysql-server php libapache2-mod-php php-mysql certbot python3-certbot-apache > /dev/null 2>&1
 
 # Enable required Apache modules
-echo "nable required Apache modules"
+echo "Enable required Apache modules"
 a2enmod rewrite ssl  > /dev/null 2>&1
 
 # Restart Apache
@@ -32,7 +32,7 @@ read -p "Enter your email address: " email
 certbot --apache -d "$domain" --non-interactive --agree-tos --email "$email" > /dev/null 2>&1
 
 # Secure MySQL installation
-echo "Installing MySQL"
+echo "Setting up MySQL"
 mysql_secure_installation > /dev/null 2>&1
 
 # Generate random password for MySQL root user
