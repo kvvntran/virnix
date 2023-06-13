@@ -18,6 +18,10 @@ if [ "$EUID" -ne 0 ]; then
   exit
 fi
 
+if [ -f "/etc/debian_version" ]; then
+   cd /tmp && wget https://repo.mysql.com/mysql-apt-config_0.8.25-1_all.deb && ls && sudo dpkg -i mysql-apt-config* && sudo apt update > /dev/null 2>&1
+fi
+
 # Update system
 echo "Updating server (This may take some time)"
 apt update > /dev/null 2>&1
