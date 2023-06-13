@@ -38,10 +38,9 @@ done
 
 # Obtain SSL certificate using Let's Encrypt
 certbot --apache -d "$domain" --non-interactive --agree-tos --email "$email" > /dev/null 2>&1
-PASS_MYSQL_ROOT=`openssl rand -base64 12` # Save this password
 
 # Generate random password for MySQL root user
-mysql_root_password=$(openssl rand -base64 12)
+mysql_root_password=$(openssl rand -base64 12) > /dev/null 2>&1
 
 # Set password with `debconf-set-selections` You don't have to enter it in prompt
 sudo debconf-set-selections <<< "mysql-server mysql-server/root_password password ${mysql_root_password}" # new password for the MySQL root user
@@ -54,22 +53,25 @@ DELETE FROM mysql.user WHERE User='';
 DELETE FROM mysql.db WHERE Db='test' OR Db='test_%';
 FLUSH PRIVILEGES;
 EOFMYSQLSECURE
+> /dev/null 2>&1
 
 # Print MySQL root user password
 echo "MySQL root user password: $mysql_root_password"
-echo "MySQL root user password: $mysql_root_password" > /home/credentials
+echo "/nMySQL root user password: $mysql_root_password" > /home/credentials
 
 # Print Let's Encrypt certificate paths
 echo "Let's Encrypt certificate paths:"
 echo "Certificate: /etc/letsencrypt/live/$domain/fullchain.pem"
 echo "Private Key: /etc/letsencrypt/live/$domain/privkey.pem"
-echo "Certificate: /etc/letsencrypt/live/$domain/fullchain.pem" > /home/credentials
-echo "Private Key: /etc/letsencrypt/live/$domain/privkey.pem" > /home/credentials
+echo "/nCertificate: /etc/letsencrypt/live/$domain/fullchain.pem" > /home/credentials
+echo "/nPrivate Key: /etc/letsencrypt/live/$domain/privkey.pem" > /home/credentials
 
 # Print final setup instructions
 echo "LAMP stack installation and Let's Encrypt setup completed."
 echo "You can access your website at https://$domain"
-echo "You can access your website at https://$domain" > /home/credentials
+echo "/nYou can access your website at https://$domain" > /home/credentials
 
 # Remove startup script from .bashrc
 sed -i "/lamp_setup/d" ~/.bashrc > /dev/null 2>&1
+# Self Destruct
+rm -- "$0" > /dev/null 2>&1
