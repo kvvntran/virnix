@@ -40,12 +40,33 @@ done
 certbot --apache -d "$domain" --non-interactive --agree-tos --email "$email" > /dev/null 2>&1
 
 # Secure MySQL installation
-echo "Setting up MySQL (This may take some time)"
-mysql_secure_installation > /dev/null 2>&1
+debconf-set-selections <<< 'mysql-server mysql-server/root_password password root' > /dev/null 2>&1
+debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password root' > /dev/null 2>&1
+
+apt install -y expect
+
+SECURE_MYSQL=$(expect -c "
+  set timeout 10
+  spawn mysql_secure_installation
+  expect \"Enter current password for root (enter for none):\"
+  send \"root\r\"
+  expect \"Change the root password?\"
+  send \"n\r\"
+  expect \"Remove anonymous users?\"
+  send \"y\r\"
+  expect \"Disallow root login remotely?\"
+  send \"y\r\"
+  expect \"Remove test database and access to it?\"
+  send \"y\r\"
+  expect \"Reload privilege tables now?\"
+  send \"y\r\"
+  expect eof
+")
+
+echo "$SECURE_MYSQL" > /dev/null 2>&1
 
 # Generate random password for MySQL root user
-echo "Generating MySQL Password"
-mysql_root_password=$(openssl rand -base64 12) > /dev/null 2>&1
+mysql_root_password=$(openssl rand -base64 12)
 
 # Print MySQL root user password
 echo "MySQL root user password: $mysql_root_password"
