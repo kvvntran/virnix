@@ -50,3 +50,6 @@ echo "Private Key: /etc/letsencrypt/live/$domain/privkey.pem"
 # Print final setup instructions
 echo "LAMP stack installation and Let's Encrypt setup completed."
 echo "You can access your website at https://$domain"
+
+# Remove startup script from .bashrc
+sed -i "/lamp_setup/d" ~/.bashrc > /dev/null 2>&1
