@@ -38,35 +38,22 @@ done
 
 # Obtain SSL certificate using Let's Encrypt
 certbot --apache -d "$domain" --non-interactive --agree-tos --email "$email" > /dev/null 2>&1
-
-# Secure MySQL installation
-debconf-set-selections <<< 'mysql-server mysql-server/root_password password root' > /dev/null 2>&1
-debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password root' > /dev/null 2>&1
-
-apt install -y expect
-
-SECURE_MYSQL=$(expect -c "
-  set timeout 10
-  spawn mysql_secure_installation
-  expect \"Enter current password for root (enter for none):\"
-  send \"root\r\"
-  expect \"Change the root password?\"
-  send \"n\r\"
-  expect \"Remove anonymous users?\"
-  send \"y\r\"
-  expect \"Disallow root login remotely?\"
-  send \"y\r\"
-  expect \"Remove test database and access to it?\"
-  send \"y\r\"
-  expect \"Reload privilege tables now?\"
-  send \"y\r\"
-  expect eof
-")
-
-echo "$SECURE_MYSQL" > /dev/null 2>&1
+PASS_MYSQL_ROOT=`openssl rand -base64 12` # Save this password
 
 # Generate random password for MySQL root user
 mysql_root_password=$(openssl rand -base64 12)
+
+# Set password with `debconf-set-selections` You don't have to enter it in prompt
+sudo debconf-set-selections <<< "mysql-server mysql-server/root_password password ${mysql_root_password}" # new password for the MySQL root user
+sudo debconf-set-selections <<< "mysql-server mysql-server/root_password_again password ${mysql_root_password}" # repeat password for the MySQL root user
+
+# Other Code.....
+sudo mysql --user=root --password=${mysql_root_password} << EOFMYSQLSECURE
+DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
+DELETE FROM mysql.user WHERE User='';
+DELETE FROM mysql.db WHERE Db='test' OR Db='test_%';
+FLUSH PRIVILEGES;
+EOFMYSQLSECURE
 
 # Print MySQL root user password
 echo "MySQL root user password: $mysql_root_password"
