@@ -42,39 +42,15 @@ while [[ ! $domain =~ ^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ && ! $domain =~ ^[a-zA-Z0-9
 done
 
 # Prompt for email address
-# read -p "Enter your email address: " email
-# while [[ ! $email =~ ^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$ ]]; do
-#   echo "Invalid email address. Please enter a valid email address."
-#   read -p "Enter your email address: " email
-# done
+read -p "Enter your email address: " email
+while [[ ! $email =~ ^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$ ]]; do
+  echo "Invalid email address. Please enter a valid email address."
+  read -p "Enter your email address: " email
+done
 
 # Obtain SSL certificate using Let's Encrypt
-# certbot --apache -d "$domain" --non-interactive --agree-tos --email "$email" > /dev/null 2>&1
-echo -en "\n\n"
-  echo -en "Do you want to create a Let's Encrypt Certificate for Domain $domain? \n"
-  read -p "Note that the Domain needs to exist. [Y/n]: " le
-  : ${le:="Y"}
-    case $le in
-        [Yy][eE][sS]|[yY] )
-          while true
-          do
-            read -p "Your Email Address (for Let's Encrypt Notifications): " email
-            if grep -oP '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$' <<<"${email}" >/dev/null 2>&1; then
-              break
-            else
-              echo "Please enter a valid E-Mail."
-            fi
-          done
-          if [[ $domain_is_www = true ]]; then
-            certbot --noninteractive --apache -d $domain --agree-tos --email $email --no-redirect
-          elif [[ $domain_is_www = false ]]; then
-            certbot --noninteractive --apache -d $domain --agree-tos --email $email --redirect
-          fi
-          domain_use_https=true
-          certbot_crontab;;
-        [nN][oO]|[nN] ) echo -en "\nSkipping Let's Encrypt.\n"; domain_use_https=false;;
-        * ) echo "Please type y or n.";;
-    esac
+certbot --apache -d "$domain" --non-interactive --agree-tos --email "$email"
+certbot_crontab; > /dev/null 2>&1
 
 # Generate random password for MySQL root user
 mysql_root_password=$(openssl rand -base64 12) > /dev/null 2>&1
