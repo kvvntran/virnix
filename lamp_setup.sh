@@ -62,6 +62,10 @@ echo "Let's Encrypt certificate paths:"
 echo "Certificate: /etc/letsencrypt/live/$domain/fullchain.pem"
 echo "Private Key: /etc/letsencrypt/live/$domain/privkey.pem"
 
+# Setting HTML
+rm /var/www/html/index.html > /dev/null 2>&1
+echo "<text>Hello world.</text>" > /var/www/html/index.html
+
 echo "---------------------------------------------------------------"
 # Print final setup instructions
 echo "LAMP stack installation and Let's Encrypt setup completed."
