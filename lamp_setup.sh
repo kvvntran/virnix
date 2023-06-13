@@ -42,6 +42,8 @@ certbot --apache -d "$domain" --non-interactive --agree-tos --email "$email" > /
 # Generate random password for MySQL root user
 mysql_root_password=$(openssl rand -base64 12) > /dev/null 2>&1
 
+echo "Setting up MySQL Server"
+
 # Set password with `debconf-set-selections` You don't have to enter it in prompt
 sudo debconf-set-selections <<< "mysql-server mysql-server/root_password password ${mysql_root_password}" # new password for the MySQL root user
 sudo debconf-set-selections <<< "mysql-server mysql-server/root_password_again password ${mysql_root_password}" # repeat password for the MySQL root user
@@ -55,21 +57,24 @@ FLUSH PRIVILEGES;
 EOFMYSQLSECURE
 > /dev/null 2>&1
 
-# Print MySQL root user password
-echo "MySQL root user password: $mysql_root_password"
-echo "MySQL root user password: $mysql_root_password" > /home/credentials
-
 # Print Let's Encrypt certificate paths
 echo "Let's Encrypt certificate paths:"
 echo "Certificate: /etc/letsencrypt/live/$domain/fullchain.pem"
 echo "Private Key: /etc/letsencrypt/live/$domain/privkey.pem"
 
-echo ""
+echo "---------------------------------------------------------------"
 # Print final setup instructions
 echo "LAMP stack installation and Let's Encrypt setup completed."
+echo ""
 echo "You can access your website at https://$domain"
+echo ""
+echo "MySQL root user password: $mysql_root_password"
+echo "MySQL root user password: $mysql_root_password" > /home/credentials
+echo ""
 echo "Your MySQL password was saved to /home/credentials"
+echo ""
 echo "You can upload your website to /var/www/html"
+echo "---------------------------------------------------------------"
 
 # Remove startup script from .bashrc
 sed -i "/lamp_setup/d" ~/.bashrc > /dev/null 2>&1
