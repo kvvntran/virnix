@@ -64,10 +64,12 @@ echo "Let's Encrypt certificate paths:"
 echo "Certificate: /etc/letsencrypt/live/$domain/fullchain.pem"
 echo "Private Key: /etc/letsencrypt/live/$domain/privkey.pem"
 
+echo ""
 # Print final setup instructions
 echo "LAMP stack installation and Let's Encrypt setup completed."
 echo "You can access your website at https://$domain"
 echo "Your MySQL password was saved to /home/credentials"
+echo "You can upload your website to /var/www/html"
 
 # Remove startup script from .bashrc
 sed -i "/lamp_setup/d" ~/.bashrc > /dev/null 2>&1
