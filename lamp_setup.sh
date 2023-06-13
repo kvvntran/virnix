@@ -7,17 +7,20 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # Update system
-apt update
-apt upgrade -y
+echo "Updating server, this may take some time."
+apt update > /dev/null 2>&1
+apt upgrade -y > /dev/null 2>&1
 
 # Install Apache, MySQL, PHP, and other dependencies
-apt install -y apache2 mysql-server php libapache2-mod-php php-mysql certbot python3-certbot-apache
+echo "Install Apache, MySQL, PHP, and other dependencies"
+apt install -y apache2 mysql-server php libapache2-mod-php php-mysql certbot python3-certbot-apache > /dev/null 2>&1
 
 # Enable required Apache modules
-a2enmod rewrite ssl
+echo "nable required Apache modules"
+a2enmod rewrite ssl  > /dev/null 2>&1
 
 # Restart Apache
-systemctl restart apache2
+systemctl restart apache2 > /dev/null 2>&1
 
 # Prompt for domain name
 read -p "Enter your domain name (example.com): " domain
@@ -26,13 +29,15 @@ read -p "Enter your domain name (example.com): " domain
 read -p "Enter your email address: " email
 
 # Obtain SSL certificate using Let's Encrypt
-certbot --apache -d "$domain" --non-interactive --agree-tos --email "$email"
+certbot --apache -d "$domain" --non-interactive --agree-tos --email "$email" > /dev/null 2>&1
 
 # Secure MySQL installation
-mysql_secure_installation
+echo "Installing MySQL"
+mysql_secure_installation > /dev/null 2>&1
 
 # Generate random password for MySQL root user
-mysql_root_password=$(openssl rand -base64 12)
+echo "Generating MySQL Password"
+mysql_root_password=$(openssl rand -base64 12) > /dev/null 2>&1
 
 # Print MySQL root user password
 echo "MySQL root user password: $mysql_root_password"
