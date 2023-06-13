@@ -7,12 +7,12 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # Update system
-echo "Updating server, this may take some time."
+echo "Updating server (This may take some time)"
 apt update > /dev/null 2>&1
 apt upgrade -y > /dev/null 2>&1
 
 # Install Apache, MySQL, PHP, and other dependencies
-echo "Installing Apache, MySQL, PHP, and other dependencies"
+echo "Installing Apache, MySQL, PHP, and other dependencies (This may take some time)"
 apt install -y apache2 mysql-server php libapache2-mod-php php-mysql certbot python3-certbot-apache > /dev/null 2>&1
 
 # Enable required Apache modules
@@ -32,7 +32,7 @@ read -p "Enter your email address: " email
 certbot --apache -d "$domain" --non-interactive --agree-tos --email "$email" > /dev/null 2>&1
 
 # Secure MySQL installation
-echo "Setting up MySQL"
+echo "Setting up MySQL (This may take some time)"
 mysql_secure_installation > /dev/null 2>&1
 
 # Generate random password for MySQL root user
