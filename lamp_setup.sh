@@ -23,10 +23,18 @@ a2enmod rewrite ssl  > /dev/null 2>&1
 systemctl restart apache2 > /dev/null 2>&1
 
 # Prompt for domain name
-read -p "Enter your domain name (example.com): " domain
+read -p "Enter your domain or subdomain name (example.com or subdomain.example.com): " domain
+while [[ ! $domain =~ ^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ && ! $domain =~ ^[a-zA-Z0-9.-]+\.[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ ]]; do
+  echo "Invalid domain or subdomain name. Please enter a valid domain or subdomain name."
+  read -p "Enter your domain or subdomain name (example.com or subdomain.example.com): " domain
+done
 
 # Prompt for email address
 read -p "Enter your email address: " email
+while [[ ! $email =~ ^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$ ]]; do
+  echo "Invalid email address. Please enter a valid email address."
+  read -p "Enter your email address: " email
+done
 
 # Obtain SSL certificate using Let's Encrypt
 certbot --apache -d "$domain" --non-interactive --agree-tos --email "$email" > /dev/null 2>&1
