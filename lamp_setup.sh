@@ -57,19 +57,17 @@ EOFMYSQLSECURE
 
 # Print MySQL root user password
 echo "MySQL root user password: $mysql_root_password"
-echo "/nMySQL root user password: $mysql_root_password" > /home/credentials
+echo "MySQL root user password: $mysql_root_password" > /home/credentials
 
 # Print Let's Encrypt certificate paths
 echo "Let's Encrypt certificate paths:"
 echo "Certificate: /etc/letsencrypt/live/$domain/fullchain.pem"
 echo "Private Key: /etc/letsencrypt/live/$domain/privkey.pem"
-echo "/nCertificate: /etc/letsencrypt/live/$domain/fullchain.pem" > /home/credentials
-echo "/nPrivate Key: /etc/letsencrypt/live/$domain/privkey.pem" > /home/credentials
 
 # Print final setup instructions
 echo "LAMP stack installation and Let's Encrypt setup completed."
 echo "You can access your website at https://$domain"
-echo "/nYou can access your website at https://$domain" > /home/credentials
+echo "Your MySQL password was saved to /home/credentials"
 
 # Remove startup script from .bashrc
 sed -i "/lamp_setup/d" ~/.bashrc > /dev/null 2>&1
