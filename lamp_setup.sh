@@ -18,12 +18,6 @@ if [ "$EUID" -ne 0 ]; then
   exit
 fi
 
-# Check if Debian | if yes then install dependencies
-# if [ -f "/etc/debian_version" ]; then
-#    sudo apt install gnupg > /dev/null 2>&1
-#    cd /tmp && wget https://repo.mysql.com/mysql-apt-config_0.8.25-1_all.deb && ls && sudo dpkg -i mysql-apt-config* && sudo apt update > /dev/null 2>&1
-# fi
-
 # Update system
 echo "Updating server (This may take some time)"
 apt update > /dev/null 2>&1
@@ -55,8 +49,10 @@ while [[ ! $email =~ ^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$ ]]; do
 done
 
 # Obtain SSL certificate using Let's Encrypt
-certbot --apache -d "$domain" --non-interactive --agree-tos --email "$email"
-certbot_crontab; > /dev/null 2>&1
+certbot --apache -d "$domain" --non-interactive --agree-tos --email "$email" || {
+  echo "Let's Encrypt setup failed. Please check the domain and email address."
+  exit 1
+}
 
 # Generate random password for MySQL root user
 mysql_root_password=$(openssl rand -base64 12) > /dev/null 2>&1
@@ -64,8 +60,8 @@ mysql_root_password=$(openssl rand -base64 12) > /dev/null 2>&1
 echo "Setting up MySQL Server"
 
 # Set password with `debconf-set-selections` You don't have to enter it in prompt
-sudo debconf-set-selections <<< "mysql-server mysql-server/root_password password ${mysql_root_password}" # new password for the MySQL root user
-sudo debconf-set-selections <<< "mysql-server mysql-server/root_password_again password ${mysql_root_password}" # repeat password for the MySQL root user
+sudo debconf-set-selections <<< "mysql-server mysql-server/root_password password ${mysql_root_password}" > /dev/null 2>&1 # new password for the MySQL root user 
+sudo debconf-set-selections <<< "mysql-server mysql-server/root_password_again password ${mysql_root_password}" > /dev/null 2>&1 # repeat password for the MySQL root user
 
 # Other Code.....
 sudo mysql --user=root --password=${mysql_root_password} << EOFMYSQLSECURE
